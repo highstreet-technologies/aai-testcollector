@@ -112,6 +112,10 @@ class AaiTestCollectorServer {
     }
 }
 
+process.on('SIGINT', function() {
+    console.log('SIGINT');
+    process.exit();
+});
 //start our server
 const server = new AaiTestCollectorServer();
 server.start(); 
