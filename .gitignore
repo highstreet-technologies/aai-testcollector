@@ -1,0 +1,12 @@
+google*.html
+node_modules/
+dist/
+npm-debug.log
+assembly/
+data/
+*.tar.gz
+package-lock.json
+yarn.lock
+pyang/
+libyang/
+distribution/yang-statistics
