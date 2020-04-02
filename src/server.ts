@@ -15,7 +15,7 @@ export const globals = {
     }
 }
 
-const SERVERPORT=8080;
+const SERVERPORT = 8080;
 const checkConsistency = true;
 const LOG = logService.getLog('AaiTestCollectorServer');
 class AaiTestCollectorServer {
@@ -37,37 +37,43 @@ class AaiTestCollectorServer {
         this.app.put('/*', (req, resp) => { this.onPutRequest(req, resp); })
         this.app.delete('/*', (req, resp) => { this.onDeleteRequest(req, resp); })
     }
-    private onGetRequest(request:express.Request, response: express.Response) {
-        this.logRequest("GET",request,response);
-        this.sendJsonResponse(response,{});
+    private onGetRequest(request: express.Request, response: express.Response) {
+        this.logRequest("GET", request, response);
+        //this.sendJsonResponse(response,{});
+        response.sendStatus(404);
     }
-    private onPostRequest(request:express.Request, response: express.Response) {
-        this.logRequest("POST",request,response);
-        this.sendJsonResponse(response,{});
+    private onPostRequest(request: express.Request, response: express.Response) {
+        this.logRequest("POST", request, response);
+        this.sendJsonResponse(response, {});
     }
-    private onPutRequest(request:express.Request, response: express.Response) {
-        this.logRequest("PUT",request,response);
-        this.sendJsonResponse(response,{});
+    private onPutRequest(request: express.Request, response: express.Response) {
+        this.logRequest("PUT", request, response);
+        this.sendJsonResponse(response, {});
     }
-    private onDeleteRequest(request:express.Request, response: express.Response) {
-        this.logRequest("DELETE",request,response);
-        this.sendJsonResponse(response,{});
+    private onDeleteRequest(request: express.Request, response: express.Response) {
+        this.logRequest("DELETE", request, response);
+        this.sendJsonResponse(response, {});
     }
-    private logRequest(method:string,request:express.Request, response: express.Response){
+    private logRequest(method: string, request: express.Request, response: express.Response) {
         LOG.info("===============================================");
         LOG.info(`received ${method} request to ${request.url}`);
-        const contentType=request.headers["content-type"];
+        const contentType = request.headers["content-type"];
         LOG.info(`type:${contentType}`);
-        var data='';
-        request.on('data', chunk => {
-            data += chunk.toString(); // convert Buffer to string
-        });
-        request.on('end', () => {
-            if(data){ 
-                LOG.info(`content:${((contentType||"")=="application/json")?JSON.stringify(data):(data)}`);
-            }
-            response.end('ok');
-        });
+        var data = '';
+        if ((contentType || "") !== "application/json") {
+            request.on('data', chunk => {
+                data += chunk.toString(); // convert Buffer to string
+            });
+            request.on('end', () => {
+                if (data) {
+                    LOG.info(`content:${data}`);
+                }
+                response.end('ok');
+            });
+        }
+        else {
+            LOG.info(`content:${JSON.stringify(request.body)}`);
+        }
     }
     private onGetFile(response: express.Response, filename: string) {
         const fn = globals.getPublicHtmlFile(filename);
@@ -112,7 +118,7 @@ class AaiTestCollectorServer {
     }
 }
 
-process.on('SIGINT', function() {
+process.on('SIGINT', function () {
     console.log('SIGINT');
     process.exit();
 });
